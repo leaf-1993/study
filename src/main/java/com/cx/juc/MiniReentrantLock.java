@@ -68,6 +68,13 @@ public class MiniReentrantLock implements MiniLock{
          * 线程
          */
         Thread thread;
+
+        public Node(Thread thread) {
+            this.thread = thread;
+        }
+
+        public Node() {
+        }
     }
 
 
@@ -98,6 +105,61 @@ public class MiniReentrantLock implements MiniLock{
 
     }
 
+    /*
+    * 尝试获取锁失败后会有哪些操作
+    * 1、将当前线程线程封装成node加入阻塞队列
+    * 2、将当前线程park掉，使线程处于挂起状态
+    *
+    * 唤醒后：
+    * 1、检查当前node节点是否为head.next节点
+    *   head.next 节点是拥有抢占权限的线程，其它node没有抢占权限
+    * 2、抢占
+    *   成功：1、将当前node设置为head，将老的head出队操作，返回业务层面
+    *   失败：2、继续park等待被唤醒
+    *
+    * --------
+    * 1、添加到阻塞队列的逻辑 addWaiter()
+    * 2、竞争资源的逻辑 acquireQueued()
+    *
+    * */
+
+    private Node addWaiter() {
+        Node newNode = new Node(Thread.currentThread());
+        // 如何入队
+        // 1、找到newNode的前置节点
+        // 2、更新newNode.prev = pred
+        // 3、CAS更新tail为newNode
+        // 4、更新pred.next = newNode;
+        Node pred = tail;
+        if(pred != null){
+            newNode.prev = pred;
+            // 当前线程成功入队
+            if(compareAndSetTail(pred, newNode)){
+                pred.next = newNode;
+                return newNode;
+            }
+        }
+
+        // 执行到这里的情况
+        // 1、tail == null 队列是空队列
+        // 2、cas设置当前newNode 为tail时失败了， 被其它线程抢先了
+        enq(newNode);
+        return newNode;
+    }
+
+    /*
+    * 自旋入队，只有成功后才返回
+    * 1、tail == null 队列是空队列
+    * 2、cas设置当前newNode 为tail时失败了， 被其它线程抢先了
+    * */
+    private void enq(Node node){
+        for (;;){
+            // 队列时空队列
+            // 当前线程时第一个抢占锁失败的线程
+            // 当前持有锁的线程并没有设置过任何node
+
+        }
+    }
     /**
      * 尝试获取锁，不会阻塞线程
      * true 获取锁成功
@@ -136,7 +198,10 @@ public class MiniReentrantLock implements MiniLock{
      * @return
      */
     private boolean hasQueuedPredecessor(){
-        return false;
+        Node h = head;
+        Node t = tail;
+        Node s;
+        return h != t &&((s = h.next) == null || s.thread != Thread.currentThread());
     }
 
     @Override
