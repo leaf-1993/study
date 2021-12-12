@@ -1,6 +1,7 @@
 package com.cx.serializable;
 
 import java.io.*;
+import java.net.URLEncoder;
 
 /**
  * @author chenxiang
@@ -12,8 +13,14 @@ import java.io.*;
 public class MainTest {
 
     public static void main(String[] args) {
-        writeSerializableObject();
-        readSerializableObject();
+        try {
+            final String utf8 = URLEncoder.encode(":", "utf8");
+            System.out.println(utf8);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+//        writeSerializableObject();
+//        readSerializableObject();
     }
 
 
