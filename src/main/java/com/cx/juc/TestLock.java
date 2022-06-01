@@ -2,8 +2,10 @@ package com.cx.juc;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
 /**
  * @author chenxiang
@@ -12,13 +14,40 @@ import java.util.concurrent.locks.Lock;
 
 public class TestLock {
     public static void main(String[] args) {
-        Lock lock = null;
-        lock.lock();
-        try {
+//        Lock lock = null;
+//        lock.lock();
+//        try {
+//
+//        }finally {
+//            lock.unlock();
+//        }
+        List<Integer> list = null;
+        list.toArray(new Integer[list.size()]);
+    }
 
-        }finally {
-            lock.unlock();
+    public int[] compressArray(int[] nums){
+        List<Integer> compressList = new ArrayList<>();
+        int mark = mark(nums[0]);
+        int sum = 0;
+        for(int i = 0; i < nums.length; i++){
+            if(mark == mark(nums[i])){
+                sum +=nums[i];
+            }else{
+                compressList.add(sum);
+                sum = nums[i];
+                mark = -mark;
+            }
         }
+        compressList.add(sum);
+        int[] retNums = new int[compressList.size()];
+        for (int i = 0; i < compressList.size(); i++){
+            retNums[i] = compressList.get(i);
+        }
+        return retNums;
+    }
+
+    public int mark(int target){
+        return target >= 0 ? 1 : -1;
     }
 
     @Test

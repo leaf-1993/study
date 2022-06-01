@@ -7,28 +7,13 @@ package com.cx.thread;
 public class InheritableThreadMapTest {
     private static final InheritableThreadLocal<Integer> t = new InheritableThreadLocal<>();
 
-    private static  InheritableThreadLocal<Integer> t1 = new InheritableThreadLocal<>();
-
 
     public static void main(String[] args) {
-        //
-//[,"addAtTail","get","addAtHead","addAtIndex","addAtHead"]
-//[[4],[4],[4],[5,0],[6]]
-        //
-        MyLinkedList list = new MyLinkedList();
-        list.addAtHead(7);
-        list.addAtHead(2);
-        list.addAtHead(1);
-        list.addAtIndex(3,0);
-        list.deleteAtIndex(2);
-        list.addAtHead(6);
-        list.addAtTail(4);
-        System.out.println(list.get(4));
-        list.addAtHead(4);
-        list.addAtIndex(5,0);
-        list.addAtHead(6);
-        System.out.println(list);
-
+        t.set(1);
+        Thread thread = new Thread(() -> {
+            Integer integer = t.get();
+        });
+        thread.start();
 
     }
 

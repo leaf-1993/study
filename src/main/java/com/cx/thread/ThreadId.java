@@ -1,5 +1,6 @@
 package com.cx.thread;
 
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -13,5 +14,18 @@ public class ThreadId {
 
     public static int get(){
         return threadId.get();
+    }
+
+    public static void remove(){
+        threadId.remove();
+    }
+
+    public static void main(String[] args) {
+        for(int i = 0; i< 100; i++){
+            new Thread(() -> {
+                System.out.println(threadId.get());
+                threadId.remove();
+            }).start();
+        }
     }
 }
